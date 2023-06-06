@@ -1,50 +1,57 @@
-import React, { useState, useEffect } from "react";
-import Grid from "@material-ui/core/Grid";
-import { GoogleLogin } from "@react-oauth/google";
-import "./Menu.js";
-import logo from "../images/cdot_logo.png";
-
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useEffect } from 'react'
+import Grid from '@material-ui/core/Grid'
+import { GoogleLogin } from '@react-oauth/google'
+// import './Menu.js'
+import logo from '../images/cdot_logo.png'
+import EnvironmentVars from '../EnvironmentVars'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   selectOrganizationName,
   selectName,
   selectEmail,
   selectAuthLoginData,
-  selectTokenExpiration,
   selectLoginFailure,
+  selectLoadingGlobal,
+  selectKcFailure,
 
   // actions
-  login,
+  keycloakLogin,
   logout,
   changeOrganization,
   setLoginFailure,
-} from "../slices/userSlice";
+  setKcFailure,
+} from '../generalSlices/userSlice'
+import { useKeycloak } from '@react-keycloak/web'
 
-import "./css/Header.css";
+import './css/Header.css'
 
 const Header = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
+  const { keycloak } = useKeycloak()
 
-  const authLoginData = useSelector(selectAuthLoginData);
-  const organizationName = useSelector(selectOrganizationName);
-  const userName = useSelector(selectName);
-  const userEmail = useSelector(selectEmail);
-  const tokenExpiration = useSelector(selectTokenExpiration);
-  const loginFailure = useSelector(selectLoginFailure);
-
-  const [tokenExpired, setTokenExpired] = useState(false);
-
-  useEffect(() => {
-    setLoginFailure(!authLoginData);
-  }, [authLoginData]);
+  const authLoginData = useSelector(selectAuthLoginData)
+  const organizationName = useSelector(selectOrganizationName)
+  const userName = useSelector(selectName)
+  const userEmail = useSelector(selectEmail)
+  const loginFailure = useSelector(selectLoginFailure)
+  const kcFailure = useSelector(selectKcFailure)
 
   useEffect(() => {
-    setTokenExpired(Date.now() < tokenExpiration);
-  }, [tokenExpiration]);
+    setLoginFailure(!authLoginData)
+  }, [authLoginData])
+
+  useEffect(() => {
+    if (!keycloak?.authenticated) {
+      const timer = setTimeout(() => {
+        dispatch(setKcFailure(true))
+      }, 2500)
+      return () => clearTimeout(timer)
+    }
+  }, [])
 
   return (
     <div>
-      {authLoginData ? (
+      {authLoginData && keycloak?.authenticated ? (
         <header id="header">
           <Grid container alignItems="center">
             <img id="logo" src={logo} alt="Logo" />
@@ -57,23 +64,16 @@ const Header = () => {
                   <select
                     id="organizationDropdown"
                     value={organizationName}
-                    onChange={(event) =>
-                      dispatch(changeOrganization(event.target.value))
-                    }
+                    onChange={(event) => dispatch(changeOrganization(event.target.value))}
                   >
-                    {(authLoginData?.data?.organizations ?? []).map(
-                      (permission) => (
-                        <option
-                          key={permission.name + "Option"}
-                          value={permission.name}
-                        >
-                          {permission.name} ({permission.role})
-                        </option>
-                      )
-                    )}
+                    {(authLoginData?.data?.organizations ?? []).map((permission) => (
+                      <option key={permission.name + 'Option'} value={permission.name}>
+                        {permission.name} ({permission.role})
+                      </option>
+                    ))}
                   </select>
                 </Grid>
-                <button id="logout" onClick={() => dispatch(logout())}>
+                <button id="logout" onClick={() => keycloak?.logout()}>
                   Logout
                 </button>
               </Grid>
@@ -87,21 +87,21 @@ const Header = () => {
               <img id="frontpagelogo" src={logo} alt="Logo" />
               <h1 id="header-text">CDOT CV Manager</h1>
             </Grid>
-            <div id="googlebtn">
-              <GoogleLogin
-                onSuccess={(res) => dispatch(login(res))}
-                text="signin_with"
-                size="large"
-                theme="outline"
-              />
+
+            <div id="keycloakbtndiv">
+              {keycloak?.authenticated && (
+                <button className="keycloak-button" onClick={() => keycloak.logout()}>
+                  Logout User
+                </button>
+              )}
             </div>
-            {loginFailure && <h3 id="loginMessage">User Unauthorized</h3>}
-            {tokenExpired && <h3 id="loginMessage">Login Timed Out</h3>}
+            {loginFailure && <h3 id="loginMessage">User Unauthorized, Please Request Access</h3>}
+            {kcFailure && <h3 id="loginMessage">Application Authentication Error!</h3>}
           </Grid>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
