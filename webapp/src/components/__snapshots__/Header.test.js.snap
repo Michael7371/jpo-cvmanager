@@ -16,12 +16,12 @@ exports[`should take a snapshot 1`] = `
           <img
             alt="Logo"
             id="frontpagelogo"
-            src="cdot_logo.png"
+            src="njdot_logo.png"
           />
           <h1
             id="header-text"
           >
-            CDOT CV Manager
+            NJDOT CV Manager
           </h1>
         </div>
         <div

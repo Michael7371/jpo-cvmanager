@@ -10,7 +10,7 @@ import configure from '../images/rsu_configure.PNG'
 const Help = () => {
   return (
     <div id="help">
-      <h1 className="helpHeader">Welcome to the CDOT CV Manager Website</h1>
+      <h1 className="helpHeader">Welcome to the NJDOT CV Manager Website</h1>
       <div className="spacer">
         <p className="pHelp">
           This application shows the physical location and message counts for each RSU installed by the Colorado
