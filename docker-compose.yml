@@ -68,7 +68,7 @@ services:
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      WEBAPP_ORIGIN: ${HOST_IP}
+      WEBAPP_ORIGIN: http://${HOST_IP}
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://${HOST_IP}:5432/postgres
       KC_DB_USERNAME: ${DB_USER}
