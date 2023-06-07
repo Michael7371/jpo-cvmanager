@@ -125,8 +125,8 @@ function MapPage(props) {
 
   // Mapbox local state variables
   const [viewState, setViewState] = useState({
-    latitude: 39.7392,
-    longitude: -104.9903,
+    latitude: 40.2712,
+    longitude: -74.7809,
     zoom: 10,
   })
 
