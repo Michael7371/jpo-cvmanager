@@ -7,6 +7,21 @@ import logging
 from pymongo import MongoClient
 from bson.json_util import loads
 
+coord_resolution = 0.05  # lats more than this are considered different
+time_resolution = 0.5  # time deltas bigger than this are considered different
+
+
+def bsm_hash(ip, timestamp, long, lat):
+    return (
+        ip
+        + "_"
+        + str(int(timestamp / time_resolution))
+        + "_"
+        + str(int(long / coord_resolution))
+        + "_"
+        + str(int(lat / coord_resolution))
+    )
+
 
 def query_bsm_data_mongo(pointList, start, end):
     start_date = util.format_date_utc_as_date(start)
@@ -24,21 +39,37 @@ def query_bsm_data_mongo(pointList, start, end):
     }
     result = []
     count = 0
+    total_count = 0
 
     logging.debug(
         f"Running query: {query} on mongo collection {os.getenv('BSM_DB_NAME')}"
     )
 
-    for doc in collection.find(query):
-        doc["properties"]["time"] = doc["properties"]["timestamp"].strftime(
-            "%Y-%m-%dT%H:%M:%SZ"
-        )
-        doc.pop("_id")
-        doc["properties"].pop("timestamp")
-        result.append(doc)
-        count += 1
+    hashmap = {}
 
-    logging.info(f"Query successful. Records returned: {count}")
+    for doc in collection.find(query):
+        message_hash = bsm_hash(
+            doc["properties"]["id"],
+            doc["properties"]["timestamp"].strftime("%s"),
+            doc["geometry"]["coordinates"][0],
+            doc["geometry"]["coordinates"][1],
+        )
+
+        if message_hash not in hashmap:
+            doc["properties"]["time"] = doc["properties"]["timestamp"].strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            )
+            doc.pop("_id")
+            doc["properties"].pop("timestamp")
+            result.append(doc)
+            count += 1
+            total_count += 1
+        else:
+            total_count += 1
+
+    logging.info(
+        f"Query successful. Records returned: {count}, Total records: {total_count}"
+    )
 
     return result, 200
 
