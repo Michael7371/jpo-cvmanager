@@ -8,7 +8,7 @@ import datetime
 from pymongo import MongoClient
 from bson.json_util import loads
 
-coord_resolution = 0.00001  # lats more than this are considered different
+coord_resolution = 0.0001  # lats more than this are considered different
 time_resolution = 10  # time deltas bigger than this are considered different
 
 
@@ -71,7 +71,7 @@ def query_bsm_data_mongo(pointList, start, end):
         f"Query successful. Records returned: {count}, Total records: {total_count}"
     )
 
-    return hashmap.values(), 200
+    return list(hashmap.values()), 200
 
 
 def query_bsm_data_bq(pointList, start, end):
