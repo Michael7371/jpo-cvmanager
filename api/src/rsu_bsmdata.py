@@ -4,11 +4,12 @@ import pytz
 import json
 import os
 import logging
+import datetime
 from pymongo import MongoClient
 from bson.json_util import loads
 
-coord_resolution = 0.05  # lats more than this are considered different
-time_resolution = 0.5  # time deltas bigger than this are considered different
+coord_resolution = 0.00001  # lats more than this are considered different
+time_resolution = 10  # time deltas bigger than this are considered different
 
 
 def bsm_hash(ip, timestamp, long, lat):
@@ -50,12 +51,13 @@ def query_bsm_data_mongo(pointList, start, end):
     for doc in collection.find(query):
         message_hash = bsm_hash(
             doc["properties"]["id"],
-            doc["properties"]["timestamp"].strftime("%s"),
+            int(datetime.datetime.timestamp(doc["properties"]["timestamp"])),
             doc["geometry"]["coordinates"][0],
             doc["geometry"]["coordinates"][1],
         )
 
         if message_hash not in hashmap:
+            hashmap[message_hash] = message_hash
             doc["properties"]["time"] = doc["properties"]["timestamp"].strftime(
                 "%Y-%m-%dT%H:%M:%SZ"
             )
