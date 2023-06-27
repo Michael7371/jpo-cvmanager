@@ -38,15 +38,13 @@ def query_bsm_data_mongo(pointList, start, end):
             "$geoWithin": {"$geometry": {"type": "Polygon", "coordinates": [pointList]}}
         },
     }
-    result = []
+    hashmap = {}
     count = 0
     total_count = 0
 
     logging.debug(
         f"Running query: {query} on mongo collection {os.getenv('BSM_DB_NAME')}"
     )
-
-    hashmap = {}
 
     for doc in collection.find(query):
         message_hash = bsm_hash(
@@ -63,7 +61,7 @@ def query_bsm_data_mongo(pointList, start, end):
             )
             doc.pop("_id")
             doc["properties"].pop("timestamp")
-            result.append(doc)
+            hashmap[message_hash] = doc
             count += 1
             total_count += 1
         else:
@@ -73,7 +71,7 @@ def query_bsm_data_mongo(pointList, start, end):
         f"Query successful. Records returned: {count}, Total records: {total_count}"
     )
 
-    return result, 200
+    return hashmap.values(), 200
 
 
 def query_bsm_data_bq(pointList, start, end):
