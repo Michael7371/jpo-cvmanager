@@ -127,7 +127,7 @@ function MapPage(props) {
   const [viewState, setViewState] = useState({
     latitude: 40.2712,
     longitude: -74.7809,
-    zoom: 10,
+    zoom: 15,
   })
 
   // RSU layer local state variables

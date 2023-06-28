@@ -62,7 +62,7 @@ export const getRsuData = createAsyncThunk(
           endDate: currentState.rsu.value.endDate,
         })
       ),
-      dispatch(getSsmSrmData()),
+      // dispatch(getSsmSrmData()),
     ])
 
     return
@@ -95,7 +95,6 @@ const _getRsuInfo = createAsyncThunk('rsu/_getRsuInfo', async (_, { getState }) 
   const organization = selectOrganizationName(currentState)
   const rsuInfo = await CdotApi.getRsuInfo(token, organization)
   const rsuData = rsuInfo.rsuList
-
   return rsuData
 })
 
@@ -136,7 +135,7 @@ const _getRsuMapInfo = createAsyncThunk('rsu/_getRsuMapInfo', async ({ startDate
   const currentState = getState()
   const token = selectToken(currentState)
   const organization = selectOrganizationName(currentState)
-  let local_date = DateTime.local({ zone: 'America/Denver' })
+  let local_date = DateTime.local({ zone: 'America/Denver' }) // TODO: change to users location
   let localEndDate = endDate === '' ? local_date.toString() : endDate
   let localStartDate = startDate === '' ? local_date.minus({ days: 1 }).toString() : startDate
 
@@ -421,6 +420,7 @@ export const rsuSlice = createSlice({
         state.value.messageLoading = false
       })
       .addCase(updateRowData.fulfilled, (state, action) => {
+        console.log(action.payload)
         if (action.payload === null) return
         state.value.rsuCounts = action.payload.rsuCounts
         state.value.countList = action.payload.countList
