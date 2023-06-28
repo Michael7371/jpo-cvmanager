@@ -3,6 +3,7 @@ services:
   cvmanager_api:
     build: ./api
     image: jpo_cvmanager_api:latest
+    restart: always
     ports:
       - '8081:8080'
     environment:
@@ -38,6 +39,7 @@ services:
   cvmanager_webapp:
     build: ./webapp
     image: jpo_cvmanager_webapp:latest
+    restart: always
     ports:
       - '80:80'
     logging:
@@ -61,6 +63,7 @@ services:
 
   cvmanager_keycloak:
     image: quay.io/keycloak/keycloak:21.1
+    restart: always
     depends_on:
       - cvmanager_postgres
     ports:

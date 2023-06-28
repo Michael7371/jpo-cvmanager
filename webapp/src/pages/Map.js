@@ -441,15 +441,6 @@ function MapPage(props) {
       id: 'bsm-layer',
       label: 'BSM Viewer',
     },
-    {
-      id: 'wzdx-layer',
-      label: 'WZDx',
-      type: 'line',
-      paint: {
-        'line-color': '#F29543',
-        'line-width': 8,
-      },
-    },
   ]
 
   const [activeLayers, setActiveLayers] = useState(['rsu-layer'])
