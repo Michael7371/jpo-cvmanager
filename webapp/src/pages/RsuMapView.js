@@ -44,10 +44,6 @@ function RsuMapView(props) {
   })
 
   useEffect(() => {
-    dispatch(getSsmSrmData())
-  }, [dispatch])
-
-  useEffect(() => {
     let localSrmCount = 0
     let localSsmCount = 0
     let localMsgList = []

@@ -132,7 +132,7 @@ class RsuQueryCounts(Resource):
         )
 
         # Validate request with supported message types
-        msgList = ["SSM", "BSM", "SPAT", "SRM", "MAP"]
+        msgList = ["TIM", "BSM", "SPAT", "PSM", "MAP"]
         if message.upper() not in msgList:
             return (
                 "Invalid Message Type.\nValid message types: SSM, BSM, SPAT, SRM, MAP",

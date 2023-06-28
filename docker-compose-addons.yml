@@ -122,6 +122,8 @@ services:
       dockerfile: Dockerfile
     image: jpo_kafka_counter:latest
     restart: always
+    depends_on:
+      - cvmanager_postgres
     env_file:
       - ./addons/images/rsu_ping_fetch/.env
     logging:
